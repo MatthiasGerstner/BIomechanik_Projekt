@@ -6,6 +6,7 @@
 #define O2_Sensor_Pin A0
 #define OOM202 0
 
+
 float measurePressure();
 float measureO2();
 void calibrateO2();
@@ -14,6 +15,7 @@ float enterNumber(String message);
 Adafruit_ADS1115 ads; // creating ADS1115 object instance to access its member functions
 
 // Global Variables
+int x;
 int16_t adc_OOM202;
 float mV_OOM202, mV_avgValue;
 float current_O2Percent = 0.00;
@@ -22,6 +24,7 @@ const float ambientAir_O2Percent = 20.9;
 float ambientAir_O2Percent_input = 0.00;
 float V, P; // Voltage & Pressure
 
+//setup
 void setup()
 {
   Serial.begin(9600);
