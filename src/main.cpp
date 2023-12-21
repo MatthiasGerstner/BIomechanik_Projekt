@@ -21,6 +21,11 @@ float mV_baselineO2 = 9.19; // millivolt value for Ambient Air (normally for aro
 const float ambientAir_O2Percent = 20.9;
 float ambientAir_O2Percent_input = 0.00;
 float V, P; // Voltage & Pressure
+const float OffSetPres = 0.483; //Calibration note DFRobot
+
+const int ARRAY_SIZE_O2 = 100; //save 100 measured Values 
+const int ARRAY_SIZE_ABS = 100; //save 100 measured Values 
+float O2Values[ARRAY_SIZE_O2];
 
 void setup()
 {
@@ -46,26 +51,73 @@ void loop()
   delay(1000);
 }
 */
+
+
+
 void loop()
 {
-  ambientAir_O2Percent_input = enterNumber("Enter current ambient O2 percentage: ");
-  Serial.print("Ambient Air O2 Percentage: ");
-  Serial.println(ambientAir_O2Percent_input);
-  calibrateO2();
-  Serial.print("O2 Preasure:  ");
-  Serial.println(measureO2());
+  
+    ambientAir_O2Percent_input = enterNumber("Enter current ambient O2 percentage: ");
+    Serial.print("Ambient Air O2 Percentage: ");
+    Serial.println(ambientAir_O2Percent_input);
+    calibrateO2();
+    Serial.print("O2 Preasure:  ");
+    Serial.println(measureO2());
+    Serial.print("absolut Preasure:  ");
+    Serial.println(measurePressure());
+    // storeO2Value();
+
+
   delay(1000);
+ /*
+ for(int i = 0; i < ARRAY_SIZE_O2; i++) {
+    Serial.print("Element an Index ");
+    Serial.print(i);
+    Serial.print(": ");
+    Serial.println(O2Values[i]);
+
+    delay(1000);
+  }
+  */
+  
 }
+
+
+/*
+void storeO2Value()
+{
+  int currentIndex = 0;   //Current index for saving the next value in the array.
+
+  if (currentIndex < ARRAY_SIZE_O2) 
+  {
+    O2Values[currentIndex] = mV_OOM202;
+    currentIndex++;
+  } else 
+    {
+    for (int i = 0; i < ARRAY_SIZE_O2 - 1; i++)
+      {
+      O2Values[i] = O2Values[i + 1];
+      }
+    O2Values[ARRAY_SIZE_O2 - 1] = mV_OOM202;
+    }
+  return;
+}
+*/
+
 
 float measurePressure()
 {
 
   // Connect sensor’s output (SIGNAL) to Analog 0
-  V = analogRead(Pressure_Sensor_Pin) * 4.5 / 1024;
-  P = (V) * 250;
 
+  // Änderungen aus https://www.codrey.com/arduino-projects/how-to-play-with-a-water-pressure-sensor/
+  
+  V = analogRead(Pressure_Sensor_Pin) * 4.5 / 1024;
+  P = (V) * 243;
+ // P = (V - OffSetPres) * 245;
   return P;
 }
+
 
 float measureO2()
 {
@@ -78,6 +130,46 @@ float measureO2()
 
   return current_O2Percent;
 }
+
+
+/*
+float measureO2()
+{ 
+  
+  adc_OOM202 = ads.readADC_SingleEnded(OOM202); // Read the ADC Value of OOM202 Sensor
+  mV_OOM202 = ads.computeVolts(adc_OOM202);     // Compute the voltage Input from OOM202 Sensor
+  mV_OOM202 = mV_OOM202 * 1000;                 // Convert volatge computed to millivolt (mV)
+  
+return mV_OOM202;
+}
+*/
+
+
+/* 
+void storeO2Value()
+{
+  int currentIndex = 0;   //Current index for saving the next value in the array.
+
+  if (currentIndex < ARRAY_SIZE_O2) 
+  {
+    O2Values[currentIndex] = current_O2Percent;
+    currentIndex++;
+  } else 
+    {
+    for (int i = 0; i < ARRAY_SIZE_O2 - 1; i++)
+      {
+      O2Values[i] = O2Values[i + 1];
+      }
+    O2Values[ARRAY_SIZE_O2 - 1] = current_O2Percent;
+    }
+  Serial.println("O2Values[currentIndex]");
+  return;
+}
+
+*/
+
+
+
 
 void calibrateO2()
 {
@@ -104,6 +196,11 @@ void calibrateO2()
   delay(1000);
   return;
 }
+
+
+
+
+
 
 float enterNumber(String message)
 {
@@ -132,3 +229,5 @@ float enterNumber(String message)
 
   return number;
 }
+
+
